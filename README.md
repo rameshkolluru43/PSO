@@ -16,6 +16,7 @@ This project is a coverage-first empirical study of fixed-$K$ PSO niching with a
 **Key features:**
 
 - Metal GPU compute kernels (2D and N-dimensional)
+- CUDA GPU kernels (2D and N-D; NVIDIA systems)
 - Fixed-$K$ niching (recommended default) plus exploratory enhanced mode (adaptive-$K$ + local refinement)
 - Ring/lbest topology baseline on Metal (`--mode ring_lbest`)
 - Coverage-centric metrics: BestCov, CentroidCov, MeanDist, MeanDist(repr), collapse diagnostics
@@ -32,6 +33,8 @@ Shaders/
 ├── src/
 │   ├── gpu/
 │   │   ├── PSO.metal
+│   │   ├── PSO.cu
+│   │   ├── cuda_pso_runner.cu
 │   │   ├── metal_gpu_runner.swift
 │   │   └── metal_gpu_runner_highdim.swift
 │   └── python/
@@ -71,6 +74,17 @@ cd ../..
 ```
 
 If `xcrun` fails because the Xcode license has not been accepted, complete Apple's license acceptance locally and rebuild.
+
+**CUDA (NVIDIA):**
+
+```bash
+cd src/gpu
+nvcc -O3 -std=c++17 cuda_pso_runner.cu -o ../../build/cuda_pso_runner
+cd ../..
+./build/cuda_pso_runner --objective 0 --particles 2048 --iterations 500
+```
+
+Objective codes: `0=sphere`, `1=rastrigin`, `2=ackley`, `3=himmelblau`, `4=six-hump`, `5=holder`.
 
 ### 2. Run 2D benchmarks
 
@@ -171,10 +185,11 @@ Reviewer-gap artifacts:
 
 ## Requirements
 
-- Apple Silicon Mac (M1/M2/M3 or later recommended)
-- macOS 12.0+
-- Xcode command-line tools
-- Python 3.8+ (`numpy`, `pandas`, `matplotlib`, `scipy`)
+- Apple Silicon Mac (M1/M2/M3 or later recommended) for Metal
+- NVIDIA GPU + CUDA toolkit (`nvcc`) for CUDA kernels
+- macOS 12.0+ (Metal path)
+- Xcode command-line tools (Metal path)
+- Python 3.8+ (`numpy`, `pandas`, `matplotlib`, `scipy`) for analysis scripts in the full workspace
 - LaTeX (optional, for rebuilding the PDF)
 
 ---
@@ -183,7 +198,7 @@ Reviewer-gap artifacts:
 
 - Strongest evidence is on 2D multimodal benchmarks with known optima; 5D/10D tests are limited validation.
 - GPU/CPU timing is feasibility and mapping evidence, not a claim of universal hardware superiority.
-- Apple Metal only in the current release; CUDA/SYCL ports are future work.
+- This repository includes CUDA kernels (`PSO.cu`) and a minimal CUDA runner; full CUDA orchestration (K-means host loop, multimodal metrics) is still in progress.
 - Canonical niching baselines beyond ring/lbest (e.g., SPSO, clearing, fitness sharing) are not yet included.
 
 ---
@@ -209,6 +224,6 @@ MIT License. See individual source files for license headers.
 
 ## Project Status
 
-Manuscript and PDF updated: **March 3, 2026**.
+Manuscript and PDF updated: **March 3, 2026**. CUDA kernels added: **June 2026**.
 
 Repository: [https://github.com/rameshkolluru43/PSO](https://github.com/rameshkolluru43/PSO)
